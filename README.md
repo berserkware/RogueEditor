@@ -12,6 +12,7 @@ Onyxdev, the original maintainer. You may
 have heard of them.
 Here's proof of Onyx's permission to use this program:
 ![proof](https://cdn.discordapp.com/attachments/1169385314746372116/1241848594819055676/IMG_9075.jpeg?ex=664bb121&is=664a5fa1&hm=d50ff7e45d38555243ce47022f2943b4c0d56a8b2536897efe5b875d1f4bd26d&)
+I'm dying for people to swarm me.
 
 ## Requirements
 
