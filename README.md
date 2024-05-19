@@ -19,7 +19,7 @@
 ## Running the program in the browser
 Want to run the program in the browser without downloading anything?
 - Register an account at https://replit.com
-- Navigate to https://replit.com/@OnyxdevSoftware/rogueEditor
+- Navigate to https://replit.com/@legacy1999/RogueEditor
 - Click fork and run
 - This requires no setup or programming skills.
 
