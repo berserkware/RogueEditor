@@ -1,0 +1,6 @@
+Copyright (C) 2024-present fire6945 josephdlee08@gmail.com
+
+This file is part of the RogueEditor project.
+
+The RogueEditor project may not be copied and/or distributed without the express
+permission of fire6945 josephdlee08@gmail.com.
