@@ -11,7 +11,7 @@ This program was passed down to me by
 Onyxdev, the original maintainer. You may
 have heard of them.
 Here's proof of Onyx's permission to use this program:
-![proof](https://cdn.discordapp.com/attachments/1234250958930706442/1241900672568262786/IMG_9076.jpeg?ex=664be1a1&is=664a9021&hm=0535e1572b4b51a7b78bbd645e3ac29809e029ccac62c30ea054e37546589340&)
+![proof](https://imgur.com/a/08ucctc)
 
 ## Requirements
 
