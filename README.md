@@ -10,8 +10,7 @@
 This program was passed down to me by
 Onyxdev, the original maintainer. You may
 have heard of them.
-Here's proof of Onyx's permission to use this program:
-![proof](https://imgur.com/a/08ucctc)
+Here's proof of Onyx's permission to use this program: https://imgur.com/a/08ucctc
 
 ## Requirements
 
