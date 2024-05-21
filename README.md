@@ -19,9 +19,10 @@ Here's proof of Onyx's permission to use this program: https://imgur.com/a/08ucc
 
 ## Running the program without Python
 
-- Download rogueEditor.zip from the "Compiled" folder
+- Download RogueEditor.zip from the "Compiled" folder
 - Unzip/extract it into your desired location (It's recommended to create a new folder)
-- Run the program with "rogueEditor.exe"
+- Run the program with "RogueEditor.exe"
+    - Tip for Dummies: do NOT remove the .exe file from the RogueEditor folder
 
 ## Running the program in the browser
 Want to run the program in the browser without downloading anything?
