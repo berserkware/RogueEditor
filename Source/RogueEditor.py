@@ -1,5 +1,8 @@
 import time
 import requests, json, random, os
+import random
+import string
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 
 '''
 Description:
@@ -20,24 +23,25 @@ class pokeRogue:
         self.login_url = "https://api.pokerogue.net/account/login"
         
         #Get trainer data api url
-        self.trainer_data_url = "https://api.pokerogue.net/savedata/get?datatype=0"
+        self.trainer_data_url = "https://api.pokerogue.net/savedata/system"
         
         #Update trainer data api url
-        self.update_trainer_data_url = "https://api.pokerogue.net/savedata/update?datatype=0"
+        self.update_trainer_data_url = "https://api.pokerogue.net/savedata/updateall"
         
         #Get gamesave data api url (slot required) -> int 0-4
-        self.gamesave_slot_url = "https://api.pokerogue.net/savedata/get?datatype=1&slot="
+        self.gamesave_slot_url = "https://api.pokerogue.net/savedata/session?slot="
         
         #Update gamesave data api url (slot required) -> int 0-4
-        self.update_gamesave_slot_url = "https://api.pokerogue.net/savedata/update?datatype=1&slot="
+        self.update_gamesave_slot_url = "https://api.pokerogue.net/savedata/updateall"
         
         #Login headers
         self.headers = {
             "content-type": "application/x-www-form-urlencoded",
-            "sec-ch-ua": "\"Google Chrome\";v=\"123\", \"Not:A-Brand\";v=\"8\", \"Chromium\";v=\"123\"",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "sec-ch-ua": "\"Brave\";v=\"125\", \"Chromium\";v=\"125\", \"Not.A/Brand\";v=\"24\"",
             "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"Windows\""
-
+            "sec-ch-ua-platform": "\"Windows\"",
+            "Origin": "https://pokerogue.net"
             }
         
         #Login payload
@@ -50,7 +54,6 @@ class pokeRogue:
         with requests.session() as s:
             
             try:
-                
              self.auth = s.post(self.login_url, headers = self.headers, data = self.data).json()["token"]
              
             except Exception as e:
@@ -61,10 +64,14 @@ class pokeRogue:
         #Session headers with authentication token
         self.auth_headers = {
          "authorization": self.auth,
-         "sec-ch-ua": "\"Google Chrome\";v=\"123\", \"Not:A-Brand\";v=\"8\", \"Chromium\";v=\"123\"",
+         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+         "sec-ch-ua": "\"Brave\";v=\"125\", \"Chromium\";v=\"125\", \"Not.A/Brand\";v=\"24\"",
          "sec-ch-ua-mobile": "?0",
-         "sec-ch-ua-platform": "\"Windows\""
+         "sec-ch-ua-platform": "\"Windows\"",
+         "Origin": "https://pokerogue.net"
         }
+        
+        self.clientSessionId = self.random_string(32)
 
         #Pokedex IDs by Pokemon name -> data['bulbasaur'] >> 1
         with open("./data/pokemon.json") as f:
@@ -75,13 +82,27 @@ class pokeRogue:
         with open("./data/data.json") as f:
             self.extra_data = json.loads(f.read())
 
+    def random_string(self, length: int, seeded: bool = False, seed: int = None) -> str:
+        characters = string.ascii_letters + string.digits
+        result = []
+
+        if seeded and seed is not None:
+            random.seed(seed)
+        
+        for _ in range(length):
+            random_index = random.randint(0, len(characters) - 1)
+            result.append(characters[random_index])
+
+        return ''.join(result)
+
     #Get trainer data -> json
     def get_trainer_data(self):
         
         try:
             
             with requests.session() as s:
-                data = s.get(self.trainer_data_url, headers = self.auth_headers).json()
+                urlWithSession = self.add_session_query_param(self.trainer_data_url)
+                data = s.get(urlWithSession, headers = self.auth_headers).json()
                 return data
         
         except Exception as e:
@@ -93,11 +114,25 @@ class pokeRogue:
         try:
             
             with requests.session() as s:
-                data = s.get(f"{self.gamesave_slot_url}{slot-1}", headers = self.auth_headers).json()
+                urlWithSession = self.add_session_query_param(f"{self.gamesave_slot_url}{slot-1}")
+                data = s.get(urlWithSession, headers = self.auth_headers).json()
                 return data
 
         except Exception as e:
             print(f"Error on get_gamesave_data() -> {e}")
+    
+    def add_session_query_param(self, url):
+        if self.clientSessionId is None:
+            self.clientSessionId = self.random_string(32)
+
+        parsed_url = urlparse(url)
+        query_params = parse_qs(parsed_url.query)
+        query_params['clientSessionId'] = [self.clientSessionId]
+
+        new_query_string = urlencode(query_params, doseq=True)
+        new_url = urlunparse(parsed_url._replace(query=new_query_string))
+
+        return new_url
 
     #Update trainer data from json payload -> None
     def update_trainer_data(self, payload):
@@ -105,23 +140,25 @@ class pokeRogue:
         try:
 
             with requests.session() as s:
-                data = s.post(self.update_trainer_data_url, headers = self.auth_headers, json = payload)
+                slot0Data = self.get_gamesave_data(1)
+                data = {
+                    "session": slot0Data,
+                    "system": payload,
+                    "clientSessionId": self.clientSessionId,
+                    "sessionSlotId": 0
+                }
+                data = s.post(self.update_trainer_data_url, headers = self.auth_headers, json = data)
                 return data
 
         except Exception as e:
             print(f"Error on update_trainer_data() -> {e}")
 
     #Update game data from json payload (slot required -> int 1-5) -> None
-    def update_gamesave_data(self, slot, payload):
+    def update_gamesave_data(self, payload):
 
-        try:
-            
-            trainer = self.get_trainer_data()
-            trainer_id, trainer_secretId = trainer["trainerId"], trainer["secretId"]
-            url_ext = f"&trainerId={trainer_id}&secretId={trainer_secretId}"
-            
+        try:            
             with requests.session() as s:
-                data = s.post(f"{self.update_gamesave_slot_url}{slot-1}{url_ext}", headers = self.auth_headers, json = payload)
+                data = s.post(self.update_gamesave_slot_url, headers = self.auth_headers, json = payload)
                 return data
 
         except Exception as e:
@@ -187,8 +224,14 @@ class pokeRogue:
 
             with open(f"slot {slot}.json", "r") as f:
                 data = json.loads(f.read())
-                self.get_trainer_data()
-                self.update_gamesave_data(slot, data)
+                system = self.get_trainer_data()
+                payload = {
+                    "session": data,
+                    "system": system,
+                    "clientSessionId": self.clientSessionId,
+                    "sessionSlotId": (slot-1)
+                }
+                self.update_gamesave_data(payload)
                 print(f"Your save data has been updated in slot: {slot}!")
                 
         except Exception as e:
