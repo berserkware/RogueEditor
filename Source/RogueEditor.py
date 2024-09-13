@@ -23,13 +23,13 @@ class pokeRogue:
         self.login_url = "https://api.pokerogue.net/account/login"
         
         #Get trainer data api url
-        self.trainer_data_url = "https://api.pokerogue.net/savedata/system"
+        self.trainer_data_url = "https://api.pokerogue.net/savedata/system/get"
         
         #Update trainer data api url
         self.update_trainer_data_url = "https://api.pokerogue.net/savedata/updateall"
         
         #Get gamesave data api url (slot required) -> int 0-4
-        self.gamesave_slot_url = "https://api.pokerogue.net/savedata/session?slot="
+        self.gamesave_slot_url = "https://api.pokerogue.net/savedata/session/get?slot="
         
         #Update gamesave data api url (slot required) -> int 0-4
         self.update_gamesave_slot_url = "https://api.pokerogue.net/savedata/updateall"
